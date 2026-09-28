@@ -1,5 +1,3 @@
-# analisis-rio-hurtado
-Análisis multitemporal del NDVI en la subcuenca del río Hurtado (2017-2024) usando Sentinel-2, Google Earth Engine y RESTREND.
 # Análisis multitemporal del NDVI en la subcuenca del río Hurtado (2017-2024)
 
 Evaluación del impacto de la megasequía mediante Sentinel-2, Google Earth Engine y el método RESTREND.
@@ -52,7 +50,42 @@ Características relevantes:
 - La estación fluviométrica "Río Hurtado en San Agustín" (código DGA 04502005) registra caudales con régimen natural.
 - Precipitación media anual: ~72,4 mm.
 - Caudal promedio histórico: ~1,8 m³/s.
-- Caudal ecológico mínimo: 0,28 m³/s.  
+- Caudal ecológico mínimo: 0,28 m³/s.
+
+---
+
+## Datos y fuentes
+
+| Dato | Fuente | Acceso |
+|---|---|---|
+| Imágenes Sentinel-2 Nivel-2A | Programa Copernicus (ESA) | Gratuito vía Google Earth Engine |
+| Límite de la subcuenca | DGA / Geoportal de Chile | Gratuito |
+| Precipitación acumulada (oct-mar) | CHIRPS v3 | Gratuito vía Google Earth Engine |
+| Banda SCL (máscara de nubes) | Incluida en Sentinel-2 Nivel-2A | Gratuito |
+
+---
+
+## Metodología
+
+### 1. Cálculo del NDVI
+
+Se utilizó la colección `COPERNICUS/S2_SR_HARMONIZED` de Sentinel-2. Para cada año se filtraron las imágenes del período enero-marzo con cobertura de nubes menor al 25%. Se aplicó una máscara de nubes basada en la banda SCL (clases 3, 8, 9, 10 y 11). El NDVI se calculó con la fórmula `(B8 - B4) / (B8 + B4)`. Se generó un compuesto mediano por año para reducir el ruido y los valores atípicos.
+
+### 2. Extracción de precipitación
+
+Se utilizó la colección CHIRPS v3 (`UCSB-CHC/CHIRPS/V3/DAILY_SAT`) para calcular la precipitación acumulada del período octubre-marzo de cada año. CHIRPS tiene una resolución espacial de ~5,5 km.
+
+### 3. Análisis RESTREND
+
+Para cada píxel se ajustó una regresión lineal entre el NDVI observado y la precipitación acumulada:
+NDVI = intercepto + pendiente × precipitación
+
+text
+
+Se calculó el NDVI predicho por el modelo y se obtuvo el residuo:
+Residuo = NDVI observado - NDVI predicho
+
+text
 
 Interpretación:
 
@@ -94,6 +127,7 @@ El análisis RESTREND con 5 años de datos **no muestra una tendencia clara ni c
 ### Interpretación
 
 El resultado más honesto es que **el análisis RESTREND no es concluyente con solo 5 años de datos**. El patrón alternante de los residuos sugiere que el modelo está sobreajustado, y las conclusiones deben limitarse a la observación comparativa entre los años extremos. Para un análisis robusto, se requiere una serie temporal de al menos 15 años, lo cual no fue posible porque Sentinel-2 solo está disponible desde 2015 y los datos de precipitación de la DGA dejaron de reportarse después de 2020.
+
 ---
 
 ## Limitaciones
